@@ -172,17 +172,81 @@ function initSidebar() {
 }
 
 // ========================================
+// Authentication Check
+// ========================================
+
+/**
+ * Get admin token from storage
+ */
+function getAdminToken() {
+    return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
+/**
+ * Check if user is authenticated, redirect to login if not
+ */
+async function checkAuth() {
+    const token = getAdminToken();
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/verify`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (!data.valid) {
+            localStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
+            return false;
+        }
+
+        // Update admin name in sidebar if exists
+        const adminNameEl = document.querySelector('.admin-name');
+        if (adminNameEl && data.admin) {
+            adminNameEl.textContent = data.admin.name;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = 'login.html';
+        return false;
+    }
+}
+
+// ========================================
 // Logout Handler
 // ========================================
 
 function initLogout() {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+        logoutBtn.addEventListener('click', async () => {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
-                // Clear any admin session if exists
+                const token = getAdminToken();
+
+                try {
+                    await fetch(`${API_BASE}/auth/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (e) {
+                    console.error('Logout error:', e);
+                }
+
                 localStorage.removeItem('adminToken');
-                window.location.href = '/';
+                sessionStorage.removeItem('adminToken');
+                window.location.href = 'login.html';
             }
         });
     }
@@ -192,7 +256,13 @@ function initLogout() {
 // Initialize on DOM Ready
 // ========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Skip auth check on login page
+    if (!window.location.pathname.includes('login.html')) {
+        const isAuth = await checkAuth();
+        if (!isAuth) return;
+    }
+
     initThemeToggle();
     initSidebar();
     initLogout();
@@ -204,5 +274,6 @@ window.AdminUtils = {
     showToast,
     formatDate,
     formatRelativeTime,
-    maskEmail
+    maskEmail,
+    getAdminToken
 };
