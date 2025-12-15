@@ -1,6 +1,6 @@
 // Dashboard Aggregator
 import { setupUI } from './modules/ui.js';
-import { setupMoodTracker } from './modules/mood.js';
+import { setupMoodTracker, loadMoodHistory } from './modules/mood.js';
 import { setupJournaling } from './modules/journal.js';
 import { setupBreathing } from './modules/breathing.js';
 import { initAffirmations } from './modules/affirmations.js';
@@ -18,6 +18,7 @@ export function initDashboard() {
 
     // Existing Features
     setupMoodTracker();
+    loadMoodHistory(); // Load weekly mood bars on page load
     setupJournaling();
     setupBreathing();
 

@@ -31,7 +31,7 @@ function init() {
     // Initialize Voice Recorder (Voice-to-Text)
     voiceRecorder = new VoiceRecorder('#btn-voice', '#chat-input', {
         lang: 'id-ID',
-        continuous: false,
+        continuous: true,
         interimResults: true
     });
 }

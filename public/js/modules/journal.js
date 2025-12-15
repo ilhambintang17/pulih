@@ -1,8 +1,10 @@
 // Journal Logic
 import { toggleModal, showToast } from './ui.js';
+import { VoiceRecorder } from './VoiceRecorder.js';
 
 let allJournalEntries = [];
 let editingId = null; // Track ID for editing
+let journalVoiceRecorder = null; // Voice Recorder instance for journal
 const userId = JSON.parse(localStorage.getItem('user'))?.id;
 
 export function setupJournaling() {
@@ -44,6 +46,17 @@ export function setupJournaling() {
     if (btnWrite) btnWrite.addEventListener('click', () => switchView(true));
     if (btnBack) btnBack.addEventListener('click', () => switchView(false));
     if (btnCancel) btnCancel.addEventListener('click', () => switchView(false));
+
+    // Initialize Voice Recorder for Journal (Voice-to-Text)
+    const journalVoiceBtn = document.getElementById('btn-journal-voice');
+    const journalTextarea = document.getElementById('journal-content-new');
+    if (journalVoiceBtn && journalTextarea) {
+        journalVoiceRecorder = new VoiceRecorder('#btn-journal-voice', '#journal-content-new', {
+            lang: 'id-ID',
+            continuous: true,
+            interimResults: true
+        });
+    }
 
     // Search Logic
     if (searchInput) {

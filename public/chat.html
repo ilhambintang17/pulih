@@ -455,7 +455,8 @@
                             class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-colors">
                             <span class="material-symbols-outlined">arrow_back</span>
                         </button>
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Entri Baru</h3>
+                        <h3 id="journal-write-title" class="text-lg font-bold text-gray-800 dark:text-white flex-1">
+                            Entri Baru</h3>
                     </div>
 
                     <div class="flex-1 flex flex-col gap-4">
@@ -476,15 +477,24 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 flex justify-end gap-3">
-                        <button id="btn-cancel-journal"
-                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                            Batal
+                    <div class="mt-4 flex items-center justify-between gap-3">
+                        <!-- Voice Input Button for Journal - placed on the left -->
+                        <button id="btn-journal-voice"
+                            class="p-3 rounded-xl text-gray-400 hover:text-primary hover:bg-green-50 dark:hover:bg-white/5 transition-colors flex items-center gap-2 border border-gray-200 dark:border-gray-700"
+                            title="Rekam Suara (Voice-to-Text)">
+                            <span class="material-symbols-outlined">mic</span>
+                            <span class="text-sm font-medium hidden sm:inline">Rekam Suara</span>
                         </button>
-                        <button id="btn-save-journal-new"
-                            class="px-8 py-2.5 rounded-xl text-sm font-bold text-black bg-primary hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
-                            Simpan
-                        </button>
+                        <div class="flex items-center gap-3">
+                            <button id="btn-cancel-journal"
+                                class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                                Batal
+                            </button>
+                            <button id="btn-save-journal-new"
+                                class="px-8 py-2.5 rounded-xl text-sm font-bold text-black bg-primary hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -758,7 +768,7 @@
                             style="min-height: 48px; max-height: 120px;"></textarea>
                         <div class="flex items-center gap-1 pr-1 pb-1">
                             <button id="btn-voice"
-                                class="hidden md:block p-3 text-gray-400 hover:text-primary transition-colors rounded-2xl hover:bg-green-50 dark:hover:bg-white/5"
+                                class="p-2 md:p-3 text-gray-400 hover:text-primary transition-colors rounded-2xl hover:bg-green-50 dark:hover:bg-white/5"
                                 title="Rekam Suara (Voice-to-Text)">
                                 <span class="material-symbols-outlined">mic</span>
                             </button>

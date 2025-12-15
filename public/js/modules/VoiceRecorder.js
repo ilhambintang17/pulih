@@ -41,6 +41,8 @@ export class VoiceRecorder {
         // State
         this.isRecording = false;
         this.recognition = null;
+        this.originalValue = ''; // Menyimpan teks sebelum recording untuk interim display
+        this.finalTranscript = ''; // Akumulasi final transcript
 
         // Inisialisasi
         this._init();
@@ -83,39 +85,39 @@ export class VoiceRecorder {
     _bindRecognitionEvents() {
         // Event: Hasil recognition
         this.recognition.onresult = (event) => {
-            let finalTranscript = '';
             let interimTranscript = '';
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const transcript = event.results[i][0].transcript;
 
                 if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
+                    // Akumulasi final transcript
+                    this.finalTranscript += transcript + ' ';
                 } else {
                     interimTranscript += transcript;
                 }
             }
 
             // Update input field dengan hasil (real-time)
-            if (finalTranscript) {
-                // Append ke teks yang sudah ada
-                const currentValue = this.inputField.value;
-                const separator = currentValue ? ' ' : '';
-                this.inputField.value = currentValue + separator + finalTranscript;
+            // Tampilkan: original value + final accumulated + interim sementara
+            const separator = this.originalValue ? ' ' : '';
+            const displayText = this.originalValue + separator + this.finalTranscript + interimTranscript;
 
-                // Trigger input event untuk auto-resize textarea jika ada
-                this.inputField.dispatchEvent(new Event('input', { bubbles: true }));
-            } else if (interimTranscript) {
-                // Tampilkan hasil sementara (opsional: bisa dipakai untuk placeholder)
-                // Untuk pengalaman lebih baik, bisa ditampilkan di placeholder atau elemen lain
-                console.log('[VoiceRecorder] Interim:', interimTranscript);
-            }
+            this.inputField.value = displayText.trim();
+
+            // Trigger input event untuk auto-resize textarea jika ada
+            this.inputField.dispatchEvent(new Event('input', { bubbles: true }));
+
+            console.log('[VoiceRecorder] Realtime:', interimTranscript || this.finalTranscript);
         };
 
         // Event: Recognition dimulai
         this.recognition.onstart = () => {
             this.isRecording = true;
             this.micButton.classList.add('is-recording');
+            // Simpan teks yang sudah ada sebelum recording
+            this.originalValue = this.inputField.value;
+            this.finalTranscript = '';
             console.log('[VoiceRecorder] Mulai merekam...');
         };
 

@@ -33,6 +33,9 @@ app.use('/api/achievements', require('./server/routes/achievements'));
 app.use('/api/safetyplan', require('./server/routes/safetyplan'));
 app.use('/api/grounding', require('./server/routes/grounding'));
 
+// Admin Panel Routes (separate from main app)
+app.use('/api/admin', require('./server/routes/admin'));
+
 app.listen(PORT, () => {
    console.log(`Server running on http://localhost:${PORT}`);
 });

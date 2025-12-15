@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Manajemen Pengguna - Pulih Admin</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec37",
+                        "primary-dark": "#0fcc2f",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2e1d",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Admin CSS -->
+    <link href="css/admin.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display transition-colors duration-200">
+    <div class="flex h-screen w-full overflow-hidden">
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- Side Navigation -->
+        <aside id="admin-sidebar" class="admin-sidebar hidden md:flex flex-col justify-between py-6 px-4">
+            <div class="flex flex-col gap-8">
+                <!-- Branding -->
+                <div class="flex items-center gap-3 px-2">
+                    <div class="flex items-center justify-center rounded-lg bg-primary/20 p-2 text-primary">
+                        <span class="material-symbols-outlined">health_and_safety</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Pulih Admin</h1>
+                        <p class="text-xs text-primary">Panel Manajemen</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex flex-col gap-2">
+                    <a class="sidebar-link" href="index.html">
+                        <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a class="sidebar-link active" href="users.html">
+                        <span class="material-symbols-outlined text-[20px]">group</span>
+                        <span class="text-sm font-medium">Pengguna</span>
+                    </a>
+                    <a class="sidebar-link" href="#">
+                        <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+                        <span class="text-sm font-medium">Konseling</span>
+                    </a>
+                    <a class="sidebar-link" href="#">
+                        <span class="material-symbols-outlined text-[20px]">description</span>
+                        <span class="text-sm font-medium">Laporan</span>
+                    </a>
+                    <a class="sidebar-link" href="#">
+                        <span class="material-symbols-outlined text-[20px]">settings</span>
+                        <span class="text-sm font-medium">Pengaturan</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- User Profile -->
+            <div
+                class="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-white/5 p-3">
+                <div
+                    class="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-primary/30 to-emerald-300 flex items-center justify-center text-primary-dark font-bold">
+                    A
+                </div>
+                <div class="flex flex-col flex-1">
+                    <p class="text-sm font-bold text-slate-900 dark:text-white">Admin</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Super Admin</p>
+                </div>
+                <button id="logout-btn" class="text-slate-400 hover:text-red-500 transition-colors" title="Logout">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main flex-1 overflow-y-auto">
+            <!-- Mobile Header -->
+            <header
+                class="md:hidden flex items-center justify-between px-4 py-3 bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+                <button id="mobile-menu-btn" class="p-2 rounded-lg bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <span class="font-bold text-lg">Pulih Admin</span>
+                <button id="theme-toggle"
+                    class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                </button>
+            </header>
+
+            <div class="p-4 md:p-8 lg:p-12">
+                <div class="max-w-6xl mx-auto flex flex-col gap-6">
+
+                    <!-- Breadcrumbs -->
+                    <nav class="flex flex-wrap gap-2 items-center text-sm">
+                        <a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors font-medium"
+                            href="index.html">Dashboard</a>
+                        <span class="text-slate-400 dark:text-slate-600">/</span>
+                        <span class="text-primary font-medium">Manajemen Pengguna</span>
+                    </nav>
+
+                    <!-- Page Heading -->
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                        <div class="flex flex-col gap-2 max-w-2xl">
+                            <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                                Manajemen Pengguna</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-base leading-relaxed">Kelola akun pengguna
+                                terdaftar dan anonim, pantau status rehabilitasi, serta atur akses akun.</p>
+                        </div>
+                        <button
+                            class="flex items-center gap-2 bg-primary hover:bg-green-500 text-black px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-green-500/20 shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">add</span>
+                            <span>Tambah Pengguna</span>
+                        </button>
+                    </div>
+
+                    <!-- Filters & Search Toolbar -->
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <!-- Search -->
+                        <div class="relative w-full md:max-w-md">
+                            <div
+                                class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                <span class="material-symbols-outlined">search</span>
+                            </div>
+                            <input id="search-input" type="text"
+                                class="block w-full rounded-xl border-none bg-slate-100 dark:bg-white/5 py-2.5 pl-10 pr-4 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-primary sm:text-sm"
+                                placeholder="Cari nama, email, atau ID..." />
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                            <select id="type-filter"
+                                class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border-none text-slate-700 dark:text-slate-200 text-sm font-medium focus:ring-primary">
+                                <option value="all">Tipe: Semua</option>
+                                <option value="registered">Terdaftar</option>
+                                <option value="anonymous">Anonim</option>
+                            </select>
+                            <select id="status-filter"
+                                class="px-3 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border-none text-slate-700 dark:text-slate-200 text-sm font-medium focus:ring-primary">
+                                <option value="all">Status: Semua</option>
+                                <option value="active">Aktif</option>
+                                <option value="suspended">Ditangguhkan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th class="w-[40px]">
+                                            <input type="checkbox" id="select-all"
+                                                class="rounded border-slate-300 text-primary focus:ring-primary bg-transparent" />
+                                        </th>
+                                        <th>Pengguna</th>
+                                        <th>Kontak/Alias</th>
+                                        <th>Tipe Akun</th>
+                                        <th>Tanggal Gabung</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3 text-slate-400">
+                                                <span
+                                                    class="material-symbols-outlined text-4xl animate-spin">progress_activity</span>
+                                                <span>Memuat data pengguna...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div
+                            class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/5">
+                            <p id="pagination-info" class="text-sm text-slate-500 dark:text-slate-400">
+                                Memuat...
+                            </p>
+                            <div id="pagination-buttons" class="flex gap-2">
+                                <!-- Pagination buttons will be rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/admin.js"></script>
+    <script src="js/admin-users.js"></script>
+</body>
+
+</html>
