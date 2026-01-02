@@ -180,9 +180,61 @@ docker build -t pulih .
 docker run -p 3000:3000 --env-file .env pulih
 ```
 
-### Heroku
+### Heroku (Recommended)
 
-Aplikasi sudah dikonfigurasi dengan `heroku.yml` untuk deployment via Docker.
+Aplikasi ini stabil di-deploy di Heroku menggunakan **Heroku Inference** addon untuk LLM API.
+
+#### Langkah Deployment:
+
+1. **Login ke Heroku CLI**
+   ```bash
+   heroku login
+   ```
+
+2. **Buat aplikasi baru**
+   ```bash
+   heroku create nama-aplikasi-anda
+   ```
+
+3. **Tambahkan Heroku Inference addon**
+   ```bash
+   heroku addons:create inference:free -a nama-aplikasi-anda
+   ```
+   
+   Addon ini menyediakan akses ke berbagai LLM models seperti Meta Llama, Claude, dll.
+
+4. **Set environment variables**
+   ```bash
+   heroku config:set DB_HOST=your_db_host -a nama-aplikasi-anda
+   heroku config:set DB_USER=your_db_user -a nama-aplikasi-anda
+   heroku config:set DB_PASSWORD=your_db_password -a nama-aplikasi-anda
+   heroku config:set DB_NAME=your_db_name -a nama-aplikasi-anda
+   heroku config:set INFERENCE_MODEL_ID=meta-llama/Llama-4-Scout-17B-16E-Instruct -a nama-aplikasi-anda
+   ```
+   
+   > **Note:** `INFERENCE_URL` dan `INFERENCE_KEY` otomatis di-set oleh Heroku Inference addon.
+
+5. **Deploy aplikasi**
+   ```bash
+   git push heroku main
+   ```
+
+6. **Buka aplikasi**
+   ```bash
+   heroku open -a nama-aplikasi-anda
+   ```
+
+#### Konfigurasi Inference Addon
+
+Heroku Inference menyediakan environment variables:
+- `INFERENCE_URL` - Endpoint API untuk LLM
+- `INFERENCE_KEY` - API key untuk autentikasi
+
+Model yang direkomendasikan:
+- `meta-llama/Llama-4-Scout-17B-16E-Instruct` (default)
+- `meta-llama/Llama-3.3-70B-Instruct`
+
+Lihat daftar model lengkap di [Heroku Inference Documentation](https://devcenter.heroku.com/articles/heroku-inference).
 
 ## API Endpoints
 
