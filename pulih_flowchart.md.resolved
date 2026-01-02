@@ -1,0 +1,400 @@
+# Pulih - Psychology Chatbot Flowchart 🌿
+
+## System Architecture Overview
+
+```mermaid
+flowchart TB
+    subgraph Client["🖥️ Frontend (Browser)"]
+        UI[HTML/CSS/JS]
+        Auth[Auth Module]
+        Chat[Chat Module]
+        Mood[Mood Tracker]
+        Journal[Journal Module]
+        Profile[Profile Module]
+    end
+    
+    subgraph Server["⚙️ Backend (Node.js/Express)"]
+        API[Express Router]
+        AuthRoute["/api/auth"]
+        ChatRoute["/api/chat"]
+        MoodRoute["/api/mood"]
+        JournalRoute["/api/journal"]
+        ProfileRoute["/api/profile"]
+        Utils[Utilities]
+    end
+    
+    subgraph External["☁️ External Services"]
+        AI[Heroku Inference API]
+        DB[(MySQL/JawsDB)]
+    end
+    
+    UI --> API
+    Auth --> AuthRoute
+    Chat --> ChatRoute
+    Mood --> MoodRoute
+    Journal --> JournalRoute
+    Profile --> ProfileRoute
+    
+    API --> Utils
+    ChatRoute --> AI
+    Utils --> DB
+```
+
+---
+
+## User Authentication Flow
+
+```mermaid
+flowchart TD
+    Start([User Opens App]) --> Landing[index.html - Landing Page]
+    Landing --> Choice{Choose Auth Method}
+    
+    Choice --> |Regular Signup| Signup[Fill Signup Form]
+    Choice --> |Login| Login[Fill Login Form]
+    Choice --> |Anonymous| Anon[Fill Anonymous Form]
+    
+    Signup --> |POST /api/auth/signup| ValidateSignup{Validate Input}
+    ValidateSignup --> |Invalid| ErrorSignup[Show Error]
+    ErrorSignup --> Signup
+    ValidateSignup --> |Valid| CheckEmail{Email Exists?}
+    CheckEmail --> |Yes| EmailError[Email Already Registered]
+    EmailError --> Signup
+    CheckEmail --> |No| CreateUser[Create User in DB]
+    
+    Login --> |POST /api/auth/login| ValidateLogin{Validate Credentials}
+    ValidateLogin --> |Invalid| ErrorLogin[Show Error]
+    ErrorLogin --> Login
+    ValidateLogin --> |Valid| FindUser{Find User}
+    FindUser --> |Not Found| UserNotFound[Invalid Credentials]
+    UserNotFound --> Login
+    FindUser --> |Found| CheckPass{Password Match?}
+    CheckPass --> |No| PassError[Invalid Credentials]
+    PassError --> Login
+    CheckPass --> |Yes| SessionCreate[Create Session]
+    
+    Anon --> |POST /api/auth/anonymous| ValidateAnon{Validate Username}
+    ValidateAnon --> |Taken| SuggestName[Suggest Alternative]
+    SuggestName --> Anon
+    ValidateAnon --> |Available| CreateAnon[Create Anonymous User]
+    
+    CreateUser --> SessionCreate
+    CreateAnon --> SessionCreate
+    
+    SessionCreate --> StoreLocal[Store User in localStorage]
+    StoreLocal --> Redirect[Redirect to chat.html]
+    Redirect --> ChatPage([Chat Interface])
+```
+
+---
+
+## Main Chat Flow
+
+```mermaid
+flowchart TD
+    subgraph Init["🚀 Initialization"]
+        ChatLoad([chat.html Loads]) --> CheckAuth{User Logged In?}
+        CheckAuth --> |No| RedirectLogin[Redirect to index.html]
+        CheckAuth --> |Yes| LoadUI[Initialize UI Components]
+        LoadUI --> LoadHistory[Load Chat History]
+        LoadHistory --> LoadMood[Load Mood Data]
+        LoadMood --> LoadJournal[Load Recent Journals]
+        LoadJournal --> Ready([Chat Ready])
+    end
+    
+    subgraph ChatProcess["💬 Chat Process"]
+        Ready --> UserInput[User Types Message]
+        UserInput --> SendBtn[Click Send / Enter]
+        SendBtn --> |POST /api/chat| ProcessMsg{Process Message}
+        
+        ProcessMsg --> CrisisCheck{Crisis Detection}
+        CrisisCheck --> |Crisis Keywords Found| CrisisPrompt[Use CRISIS_SYSTEM_PROMPT]
+        CrisisCheck --> |Normal Message| NormalPrompt[Use NORMAL_SYSTEM_PROMPT]
+        
+        CrisisPrompt --> GetContext[Fetch User Context]
+        NormalPrompt --> GetContext
+        
+        GetContext --> BuildContext[Build Context String]
+        BuildContext --> FetchMood[Get Latest Mood]
+        FetchMood --> FetchJournals[Get Last 5 Journals]
+        FetchJournals --> PreparePayload[Prepare AI Request]
+        
+        PreparePayload --> CallAI[Call Heroku Inference API]
+        CallAI --> StreamResponse[Stream SSE Response]
+        StreamResponse --> RenderChunks[Render Chunks in UI]
+        RenderChunks --> Complete[Complete Response]
+        Complete --> SaveSession[Save to Chat History]
+        SaveSession --> CheckCrisis{Crisis Detected?}
+        CheckCrisis --> |Yes| ShowModal[Show Emergency Modal]
+        CheckCrisis --> |No| UserInput
+        ShowModal --> UserChoice{User Choice}
+        UserChoice --> |Call 119| EmergencyCall[Open Phone Dialer]
+        UserChoice --> |Continue Chat| UserInput
+    end
+```
+
+---
+
+## AI Response Generation Flow
+
+```mermaid
+flowchart LR
+    subgraph Input["📥 Input Processing"]
+        Msg[User Message] --> Crisis{Crisis Check}
+        Crisis --> |Yes| CrisisMode[Crisis Mode]
+        Crisis --> |No| NormalMode[Normal Mode]
+    end
+    
+    subgraph Context["📊 Context Building"]
+        CrisisMode --> FetchData
+        NormalMode --> FetchData
+        FetchData[getDataContext] --> MoodData[Latest Mood + Note]
+        FetchData --> JournalData[Last 5 Journal Entries]
+        MoodData --> ContextStr[Build Context String]
+        JournalData --> ContextStr
+    end
+    
+    subgraph API["🤖 AI API Call"]
+        ContextStr --> Payload[Build API Payload]
+        Payload --> |System Prompt| SP[Selected System Prompt]
+        Payload --> |History| Hist[Conversation History]
+        Payload --> |User Message| UMsg[Current Message]
+        SP --> HerokuAPI[Heroku Inference API]
+        Hist --> HerokuAPI
+        UMsg --> HerokuAPI
+    end
+    
+    subgraph Output["📤 Response Streaming"]
+        HerokuAPI --> SSE[Server-Sent Events]
+        SSE --> Chunks[Response Chunks]
+        Chunks --> Render[Real-time UI Render]
+        Render --> Done([Complete])
+    end
+```
+
+---
+
+## Mood Tracker Flow
+
+```mermaid
+flowchart TD
+    Start([Open Mood Tracker]) --> LoadHistory[GET /api/mood/history]
+    LoadHistory --> RenderChart[Render 7-Day Chart]
+    RenderChart --> ShowUI[Display Mood Interface]
+    
+    ShowUI --> UserAction{User Action}
+    
+    UserAction --> |Log Mood| SelectMood[Select Emoji 1-5]
+    SelectMood --> AddNote{Add Note?}
+    AddNote --> |Yes| WriteNote[Write Optional Note]
+    AddNote --> |No| SaveMood
+    WriteNote --> SaveMood[POST /api/mood/log]
+    SaveMood --> UpdateDB[(Save to MySQL)]
+    UpdateDB --> UpdateStreak[Update User Streak]
+    UpdateStreak --> RefreshChart[Refresh Mood Chart]
+    RefreshChart --> ShowUI
+    
+    UserAction --> |View Summary| CalcSummary[Calculate Weekly Average]
+    CalcSummary --> ShowInsight[Display AI-Generated Insight]
+    ShowInsight --> ShowUI
+```
+
+---
+
+## Journal Flow
+
+```mermaid
+flowchart TD
+    Start([Open Journal]) --> LoadEntries[GET /api/journal/entries]
+    LoadEntries --> RenderList[Display Journal List]
+    RenderList --> ShowDashboard[Show Journal Dashboard]
+    
+    ShowDashboard --> UserAction{User Action}
+    
+    UserAction --> |New Entry| OpenEditor[Open Write Modal]
+    OpenEditor --> WriteContent[Write Journal Content]
+    WriteContent --> SaveEntry[POST /api/journal/create]
+    SaveEntry --> GenerateFeedback[AI Generates Feedback]
+    GenerateFeedback --> StoreDB[(Save Entry + Feedback)]
+    StoreDB --> RefreshList[Refresh Entry List]
+    RefreshList --> ShowDashboard
+    
+    UserAction --> |View Entry| SelectEntry[Click Entry]
+    SelectEntry --> DisplayContent[Show Full Content]
+    DisplayContent --> ShowDashboard
+    
+    UserAction --> |Edit Entry| EditMode[Enable Edit Mode]
+    EditMode --> ModifyContent[Modify Content]
+    ModifyContent --> UpdateEntry[POST /api/journal/update]
+    UpdateEntry --> RegenerateFeedback[Regenerate AI Feedback]
+    RegenerateFeedback --> UpdateDB[(Update in MySQL)]
+    UpdateDB --> RefreshList
+    
+    UserAction --> |Delete Entry| ConfirmDelete{Confirm?}
+    ConfirmDelete --> |Yes| DeleteEntry[POST /api/journal/delete]
+    DeleteEntry --> RemoveDB[(Remove from MySQL)]
+    RemoveDB --> RefreshList
+    ConfirmDelete --> |No| ShowDashboard
+```
+
+---
+
+## Breathing Exercise Flow
+
+```mermaid
+flowchart TD
+    Start([Open Breathing Exercise]) --> ShowUI[Display Breathing Interface]
+    ShowUI --> UserStart[User Clicks Start]
+    
+    UserStart --> Cycle{4-7-8 Breathing Cycle}
+    
+    Cycle --> Inhale[Inhale - 4 Seconds]
+    Inhale --> |Animation: Circle Expands| InhaleAnim[Visual Feedback]
+    InhaleAnim --> Hold[Hold - 7 Seconds]
+    Hold --> |Animation: Circle Holds| HoldAnim[Visual Feedback]
+    HoldAnim --> Exhale[Exhale - 8 Seconds]
+    Exhale --> |Animation: Circle Contracts| ExhaleAnim[Visual Feedback]
+    ExhaleAnim --> CycleCount{Cycle Complete?}
+    
+    CycleCount --> |More Cycles| Cycle
+    CycleCount --> |All Done| Complete[Exercise Complete]
+    Complete --> Feedback[Show Completion Message]
+    Feedback --> ShowUI
+```
+
+---
+
+## Profile Management Flow
+
+```mermaid
+flowchart TD
+    Start([Open Profile Page]) --> CheckAuth{Authenticated?}
+    CheckAuth --> |No| RedirectLogin[Redirect to Login]
+    CheckAuth --> |Yes| LoadProfile[GET /api/profile]
+    
+    LoadProfile --> DisplayInfo[Show User Information]
+    DisplayInfo --> ShowStats[Display Stats & Streaks]
+    ShowStats --> ShowUI[Profile Dashboard]
+    
+    ShowUI --> UserAction{User Action}
+    
+    UserAction --> |Edit Nickname| OpenEdit[Enable Edit Mode]
+    OpenEdit --> TypeName[Enter New Nickname]
+    TypeName --> SaveName[PUT /api/profile/update]
+    SaveName --> UpdateDB[(Update in MySQL)]
+    UpdateDB --> RefreshUI[Refresh Profile Display]
+    RefreshUI --> ShowUI
+    
+    UserAction --> |View Stats| ShowDetailed[Detailed Statistics]
+    ShowDetailed --> MoodStats[Mood Tracking Stats]
+    MoodStats --> JournalStats[Journal Entry Count]
+    JournalStats --> StreakInfo[Current Streak]
+    StreakInfo --> ShowUI
+    
+    UserAction --> |Logout| ClearSession[Clear localStorage]
+    ClearSession --> RedirectLogin
+```
+
+---
+
+## Database Schema
+
+```mermaid
+erDiagram
+    USERS {
+        varchar id PK
+        varchar fullName
+        varchar email UK
+        varchar username UK
+        varchar password
+        datetime joinedDate
+        boolean isAnonymous
+        int streak
+        date lastActiveDate
+    }
+    
+    CHATS {
+        varchar id PK
+        varchar userId FK
+        varchar title
+        json messages
+        datetime createdAt
+        datetime updatedAt
+    }
+    
+    MOOD_LOGS {
+        int id PK
+        varchar userId FK
+        int moodLevel
+        text note
+        datetime loggedAt
+    }
+    
+    JOURNAL_ENTRIES {
+        int id PK
+        varchar userId FK
+        text content
+        text aiFeedback
+        datetime createdAt
+        datetime updatedAt
+    }
+    
+    USERS ||--o{ CHATS : "has"
+    USERS ||--o{ MOOD_LOGS : "logs"
+    USERS ||--o{ JOURNAL_ENTRIES : "writes"
+```
+
+---
+
+## Complete System Flow Summary
+
+```mermaid
+flowchart TB
+    User([👤 User]) --> |Opens App| Landing[🏠 Landing Page]
+    
+    Landing --> Auth{🔐 Authentication}
+    Auth --> |Success| ChatUI[💬 Chat Interface]
+    
+    ChatUI --> Features{Select Feature}
+    
+    Features --> |Chat| AIChat[🤖 AI Counselor]
+    Features --> |Mood| MoodTracker[📊 Mood Tracker]
+    Features --> |Journal| JournalModule[📓 Journal]
+    Features --> |Breathing| BreathingExercise[🧘 Breathing]
+    Features --> |Profile| ProfilePage[👤 Profile]
+    
+    AIChat --> |Message| ProcessAI{Process}
+    ProcessAI --> |Normal| NormalResponse[😊 Empathetic Response]
+    ProcessAI --> |Crisis| CrisisResponse[🚨 Crisis Support]
+    CrisisResponse --> |Hotline| Emergency[📞 119 Hotline]
+    
+    MoodTracker --> |Log| MoodDB[(💾 Save Mood)]
+    JournalModule --> |Write| JournalDB[(💾 Save Entry)]
+    
+    MoodDB --> AIContext[📊 AI Context]
+    JournalDB --> AIContext
+    AIContext --> AIChat
+    
+    ProfilePage --> Settings[⚙️ Manage Account]
+    Settings --> |Logout| Landing
+```
+
+---
+
+## Legend
+
+| Symbol | Meaning |
+|--------|---------|
+| 🤖 | AI-Powered Feature |
+| 💬 | Chat/Communication |
+| 🔐 | Authentication |
+| 📊 | Data/Analytics |
+| 📓 | Journal/Notes |
+| 🧘 | Wellness Feature |
+| 🚨 | Crisis/Emergency |
+| 💾 | Database Operation |
+| ☁️ | External API |
+
+---
+
+*Pulih - Flowchart Documentation*
+*Generated for psychological support chatbot application*

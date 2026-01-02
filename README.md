@@ -4,7 +4,9 @@
 
 ## Preview
 
-![Login Page](public/img/preview.png)
+| Login | Chat | Journal | Profile |
+|:-----:|:----:|:-------:|:-------:|
+| ![Login](public/img/preview.png) | ![Chat](public/img/preview_chat.png) | ![Journal](public/img/preview_journal.png) | ![Profile](public/img/preview_profile.png) |
 
 ## Fitur Utama
 
@@ -95,8 +97,10 @@ flowchart TD
 | Frontend | HTML, CSS, JavaScript |
 | Backend | Node.js, Express.js |
 | Database | MySQL |
-| AI/LLM | OpenAI-compatible API |
+| AI/LLM | OpenAI-compatible API (any provider) |
 | Styling | TailwindCSS |
+
+> **Note:** Aplikasi ini menggunakan external AI API dengan format OpenAI-compatible. Anda dapat menggunakan berbagai provider seperti OpenAI, Groq, Together AI, OpenRouter, atau self-hosted LLM dengan endpoint yang kompatibel.
 
 ## Struktur Direktori
 
@@ -203,7 +207,4 @@ ISC
 
 ## Disclaimer
 
-Pulih adalah aplikasi pendukung kesehatan mental dan **bukan pengganti** konsultasi dengan psikolog atau psikiater berlisensi. Jika Anda mengalami krisis kesehatan mental, hubungi layanan darurat atau hotline kesehatan mental:
-
-- **Into The Light Indonesia**: 119 ext. 8
-- **Yayasan Pulih**: (021) 788-42580
+Pulih adalah aplikasi pendukung kesehatan mental dan **bukan pengganti** konsultasi dengan psikolog atau psikiater berlisensi. Jika Anda mengalami krisis kesehatan mental, segera hubungi layanan profesional terdekat.
