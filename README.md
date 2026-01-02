@@ -1,204 +1,209 @@
-# Pulih - Chatbot Psikolog AI 🌿
+# Pulih
 
-**Pulih** adalah platform chatbot berbasis AI yang dirancang untuk memberikan dukungan psikologis awal dan ruang aman bagi pengguna, khususnya korban kekerasan seksual. Aplikasi ini menyediakan teman bicara yang empatik, non-judgmental, dan tersedia 24/7.
+**Pulih** adalah chatbot kesehatan mental berbasis AI yang dirancang untuk memberikan dukungan emosional kepada pengguna. Aplikasi ini menggunakan pendekatan percakapan yang hangat dan empatik, bukan sebagai pengganti terapi profesional, tetapi sebagai teman yang hadir untuk mendengarkan.
 
-![Tampilan Aplikasi](public/img/preview.png)
+## Preview
 
-## ✨ Fitur Utama
+![Login Page](public/img/preview.png)
 
-### 💬 Chatbot AI Empatik
-- **Respons Humanis**: AI yang merespons seperti teman baik, bukan robot. Menggunakan bahasa sehari-hari yang hangat dan validatif.
-- **Trauma-Informed**: Didesain khusus untuk korban kekerasan seksual dengan pendekatan yang sensitif dan non-judgmental.
-- **Mode Krisis**: Deteksi otomatis kondisi krisis dengan respons yang lebih intens dan empati mendalam sebelum menawarkan resources.
-- **Context-Aware**: AI mengingat riwayat percakapan, mood terkini, dan catatan jurnal untuk memberikan respons yang lebih personal.
-- **Real-time Streaming**: Respons AI muncul secara bertahap seperti mengetik, memberikan pengalaman yang lebih natural.
+## Fitur Utama
 
-### 📊 Mood Tracker
-- **Log Mood Harian**: Catat perasaanmu dengan 5 level emoji ekspresif.
-- **Catatan Opsional**: Tambahkan catatan singkat untuk setiap mood yang dicatat.
-- **Grafik 7 Hari**: Visualisasi mood mingguan dengan Chart.js.
-- **Weekly Summary**: Ringkasan mood mingguan dengan insight otomatis.
-- **Integrasi AI**: Mood terbaru digunakan AI untuk memberikan respons yang lebih relevan.
+- **AI Chat** - Percakapan dengan AI counselor yang responsif dan empatik
+- **Crisis Detection** - Deteksi otomatis kata kunci krisis dengan respons khusus
+- **Mood Tracking** - Pelacakan mood harian untuk memantau kesejahteraan emosional
+- **Journaling** - Fitur catatan harian dengan insight dari AI
+- **Chat History** - Riwayat percakapan tersimpan untuk kontinuitas sesi
+- **Anonymous Mode** - Opsi penggunaan anonim untuk privasi pengguna
 
-### 📓 Journal / Catatan Harian
-- **Ruang Aman**: Catat perasaan dan perjalanan pemulihanmu dalam jurnal pribadi.
-- **Dashboard Modern**: Tampilan jurnal dengan sidebar dan list entry yang elegan.
-- **Edit Entry**: Edit catatan jurnal yang sudah ada.
-- **Hapus Entry**: Hapus catatan yang tidak diinginkan.
-- **Integrasi AI**: AI membaca 5 jurnal terakhir untuk memberikan saran yang lebih personal.
+## Arsitektur Aplikasi
 
-### 🧘 Latihan Pernapasan (Breathing Exercise)
-- **Guided Breathing**: Latihan napas 4-7-8 yang terpandu dengan animasi visual.
-- **Animasi Interaktif**: Lingkaran yang mengembang dan mengecil mengikuti ritme napas.
-- **Progress Text**: Panduan teks real-time (Tarik Napas → Tahan → Hembuskan).
+```mermaid
+flowchart TB
+    subgraph Client["Frontend (Browser)"]
+        UI[Web Interface]
+        Auth[Auth Module]
+        Chat[Chat Module]
+        Mood[Mood Module]
+        Journal[Journal Module]
+    end
 
-### 🚨 Emergency / Crisis Support
-- **Deteksi Otomatis**: AI mendeteksi kata-kata krisis dan menampilkan modal darurat.
-- **Akses Cepat 119**: Tombol langsung untuk menghubungi hotline darurat nasional.
-- **Non-Judgmental**: Opsi untuk tetap curhat jika pengguna belum siap bicara dengan profesional.
+    subgraph Server["Backend (Node.js/Express)"]
+        API[API Routes]
+        AuthRoute["/api/auth"]
+        ChatRoute["/api/chat"]
+        MoodRoute["/api/mood"]
+        JournalRoute["/api/journal"]
+        ProfileRoute["/api/profile"]
+    end
 
-### 👤 Manajemen Profil & Autentikasi
-- **Register & Login**: Sistem autentikasi lengkap dengan validasi.
-- **Mode Anonim**: Opsi chat tanpa registrasi untuk privasi maksimal.
-- **Profil Pengguna**: Ubah nama panggilan dan lihat status keanggotaan.
-- **Session Management**: Login aman dengan session yang terenkripsi.
+    subgraph Services["External Services"]
+        LLM[LLM Inference API]
+        DB[(MySQL Database)]
+    end
 
-### 🎨 User Experience
-- **Dark Mode & Light Mode**: Toggle manual dengan tampilan yang nyaman di mata.
-- **Glassmorphism Design**: Desain premium dengan efek kaca modern.
-- **Responsive Design**: Optimal di Desktop maupun Mobile (termasuk fix viewport Android).
-- **Smart Suggestions**: Tombol saran cepat saat tidak tahu harus mulai dari mana.
-- **Riwayat Chat**: Simpan dan akses kembali sesi percakapan sebelumnya.
+    UI --> Auth
+    UI --> Chat
+    UI --> Mood
+    UI --> Journal
 
-### 🎤 Voice-to-Text
-- **Speech Recognition**: Fitur input suara menggunakan Web Speech API native.
-- **Bahasa Indonesia**: Dioptimalkan untuk pengenalan bahasa Indonesia (id-ID).
-- **Toggle Recording**: Klik tombol mic untuk mulai/stop merekam.
-- **Visual Feedback**: Animasi heartbeat saat merekam aktif.
+    Auth --> AuthRoute
+    Chat --> ChatRoute
+    Mood --> MoodRoute
+    Journal --> JournalRoute
 
-## 📊 Application Flowchart
+    API --> AuthRoute
+    API --> ChatRoute
+    API --> MoodRoute
+    API --> JournalRoute
+    API --> ProfileRoute
 
-Berikut adalah alur kerja utama aplikasi Pulih:
+    ChatRoute --> LLM
+    JournalRoute --> LLM
+    AuthRoute --> DB
+    ChatRoute --> DB
+    MoodRoute --> DB
+    JournalRoute --> DB
+    ProfileRoute --> DB
+```
 
-![Pulih Application Flowchart](docs/flowchart.png)
+## Alur Chat dengan Crisis Detection
 
-**Penjelasan Alur:**
-1. **User** membuka aplikasi dan masuk ke **Landing Page**
-2. **Authentication** - Login/Register atau Mode Anonim
-3. **Chat Interface** - Antarmuka utama untuk berkomunikasi dengan AI
-4. **Select Feature** - Pilih fitur yang tersedia:
-   - 📊 **Mood Tracker** → Log mood → Simpan ke database
-   - 📓 **Journal** → Tulis catatan → Simpan entry
-   - 🧘 **Breathing** → Latihan napas terpandu
-   - 👤 **Profile** → Kelola akun
-5. **AI Context** - Data mood dan jurnal digunakan untuk personalisasi respons
-6. **AI Counselor** - Memproses pesan dan menentukan jenis respons
-7. **Crisis Detection** - Deteksi kondisi krisis:
-   - **Normal** → Respons empatik biasa
-   - **Crisis** → Respons krisis + akses hotline 119
+```mermaid
+flowchart TD
+    A[User mengirim pesan] --> B{Cek Crisis Keywords}
+    B -->|Terdeteksi| C[Gunakan Crisis System Prompt]
+    B -->|Tidak| D[Gunakan Normal System Prompt]
+    
+    C --> E[Tambah Context Data]
+    D --> E
+    
+    E --> F{Ada User ID?}
+    F -->|Ya| G[Ambil Mood & Journal terbaru]
+    F -->|Tidak| H[Skip Context]
+    
+    G --> I[Kirim ke LLM API]
+    H --> I
+    
+    I --> J[Stream Response ke Client]
+    J --> K[Simpan ke Chat History]
+```
 
-## 🛠️ Teknologi yang Digunakan
+## Tech Stack
 
-| Kategori | Teknologi |
-|----------|-----------|
-| **Frontend** | HTML5, Vanilla JavaScript (ES Modules), Tailwind CSS |
-| **Backend** | Node.js, Express.js |
-| **Database** | MySQL (JawsDB di Heroku) |
-| **AI Engine** | Heroku Inference API (Server-side Streaming) |
-| **Charts** | Chart.js |
-| **Icons** | Google Material Symbols |
-| **Deployment** | Heroku |
+| Layer | Teknologi |
+|-------|-----------|
+| Frontend | HTML, CSS, JavaScript |
+| Backend | Node.js, Express.js |
+| Database | MySQL |
+| AI/LLM | OpenAI-compatible API |
+| Styling | TailwindCSS |
 
-## 🚀 Cara Menjalankan Project (Lokal)
+## Struktur Direktori
 
-### Prasyarat
-- Node.js (v18 atau lebih baru)
-- npm (Node Package Manager)
-- MySQL Database (Lokal atau Cloud)
+```
+pisikologchatbot/
+├── server.js              # Entry point aplikasi
+├── server/
+│   ├── routes/
+│   │   ├── auth.js        # Autentikasi & registrasi
+│   │   ├── chat.js        # Chat completion & history
+│   │   ├── mood.js        # Mood tracking
+│   │   ├── journal.js     # Journaling
+│   │   └── profile.js     # User profile
+│   └── utils/
+│       ├── db.js          # Database operations
+│       └── systemPrompt.js # AI system prompts
+├── public/
+│   ├── index.html         # Landing & auth page
+│   ├── chat.html          # Chat interface
+│   ├── profile.html       # User profile
+│   ├── css/               # Stylesheets
+│   └── js/                # Frontend modules
+└── package.json
+```
 
-### Instalasi
+## Instalasi
 
-1. **Clone Repository**
+### Prerequisites
+
+- Node.js 18+
+- MySQL Database
+- API Key untuk LLM Inference
+
+### Setup
+
+1. Clone repository
    ```bash
-   git clone https://github.com/MuhamadMatin/prototypePulih.git
-   cd prototypePulih
+   git clone https://github.com/ilhambintang17/pulih.git
+   cd pulih
    ```
 
-2. **Install Dependensi**
+2. Install dependencies
    ```bash
    npm install
    ```
 
-3. **Konfigurasi Environment Variable**
-   Buat file `.env` di direktori utama:
+3. Konfigurasi environment variables
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Isi file `.env` dengan konfigurasi:
    ```env
    PORT=3000
-   
-   # Database
    DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=password_db_kamu
-   DB_NAME=pulih_db
-
-   # AI Configuration
-   INFERENCE_URL=https://api-inference.heroku.com
-   INFERENCE_KEY=kunci_api_anda
-   INFERENCE_MODEL_ID=model-id-anda
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   DB_NAME=pulih
+   INFERENCE_URL=https://your-llm-api.com
+   INFERENCE_KEY=your_api_key
+   INFERENCE_MODEL_ID=your_model_id
    ```
 
-4. **Jalankan Server**
+4. Jalankan aplikasi
    ```bash
-   npm start
-   ```
-   Akses aplikasi di `http://localhost:3000`
-
-## 📦 Deployment (Heroku)
-
-1. Login ke Heroku:
-   ```bash
-   heroku login
-   heroku container:login
+   node server.js
    ```
 
-2. Tambahkan Addon JawsDB (MySQL):
-   ```bash
-   heroku addons:create jawsdb:kitefin
-   ```
+5. Akses aplikasi di `http://localhost:3000`
 
-3. Set Environment Variables di Dashboard Heroku atau via CLI.
+## Deployment
 
-4. Push ke Heroku:
-   ```bash
-   git push heroku main
-   ```
+### Docker
 
-## 📁 Struktur Project
-
-```
-pisikologchatbot/
-├── public/
-│   ├── index.html          # Landing & Login Page
-│   ├── chat.html           # Main Chat Interface
-│   ├── profile.html        # User Profile Page
-│   ├── css/                # Stylesheets
-│   ├── js/
-│   │   ├── auth.js         # Authentication Logic
-│   │   ├── chat.js         # Chat & AI Streaming
-│   │   ├── dashboard.js    # Dashboard Controller
-│   │   └── modules/
-│   │       ├── breathing.js  # Breathing Exercise
-│   │       ├── journal.js    # Journal CRUD
-│   │       ├── mood.js       # Mood Tracker
-│   │       └── ui.js         # UI Utilities
-│   └── img/                # Images & Assets
-├── server/
-│   ├── routes/
-│   │   ├── auth.js         # Auth Endpoints
-│   │   ├── chat.js         # Chat & AI Endpoint
-│   │   ├── journal.js      # Journal CRUD API
-│   │   ├── mood.js         # Mood Tracker API
-│   │   └── profile.js      # Profile API
-│   ├── utils/
-│   │   ├── db.js           # Database Connection
-│   │   └── systemPrompt.js # AI System Prompts
-│   └── config/
-│       └── schema.sql      # Database Schema
-├── server.js               # Main Server Entry
-├── package.json
-└── README.md
+```bash
+docker build -t pulih .
+docker run -p 3000:3000 --env-file .env pulih
 ```
 
-## 🤝 Kontribusi
+### Heroku
 
-1. **Fork** repository ini.
-2. Buat branch fitur baru (`git checkout -b fitur-keren`).
-3. Commit perubahan Anda (`git commit -m 'Menambahkan fitur keren'`).
-4. Push ke branch (`git push origin fitur-keren`).
-5. Buat **Pull Request**.
+Aplikasi sudah dikonfigurasi dengan `heroku.yml` untuk deployment via Docker.
 
-## 📄 Lisensi
+## API Endpoints
 
-Distributed under the MIT License. See `LICENSE` for more information.
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| POST | `/api/auth/register` | Registrasi user baru |
+| POST | `/api/auth/login` | Login user |
+| POST | `/api/auth/anonymous` | Buat sesi anonim |
+| GET | `/api/chat/history` | Ambil riwayat chat |
+| POST | `/api/chat` | Kirim pesan chat (streaming) |
+| POST | `/api/chat/session` | Simpan sesi chat |
+| POST | `/api/chat/summary` | Generate ringkasan sesi |
+| POST | `/api/chat/suggest` | Generate saran respons |
+| POST | `/api/mood` | Simpan data mood |
+| GET | `/api/mood` | Ambil data mood |
+| POST | `/api/journal` | Simpan journal entry |
+| GET | `/api/journal` | Ambil journal entries |
 
----
-*Dibuat dengan ❤️ untuk kesehatan mental Indonesia.*
+## Lisensi
+
+ISC
+
+## Disclaimer
+
+Pulih adalah aplikasi pendukung kesehatan mental dan **bukan pengganti** konsultasi dengan psikolog atau psikiater berlisensi. Jika Anda mengalami krisis kesehatan mental, hubungi layanan darurat atau hotline kesehatan mental:
+
+- **Into The Light Indonesia**: 119 ext. 8
+- **Yayasan Pulih**: (021) 788-42580
