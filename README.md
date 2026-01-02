@@ -4,9 +4,9 @@
 
 ## Preview
 
-| Login | Chat | Journal | Profile |
-|:-----:|:----:|:-------:|:-------:|
-| ![Login](public/img/preview.png) | ![Chat](public/img/preview_chat.png) | ![Journal](public/img/preview_journal.png) | ![Profile](public/img/preview_profile.png) |
+| Login | Chat | Profile |
+|:-----:|:----:|:-------:|
+| ![Login](public/img/preview.png) | ![Chat](public/img/preview_chat.png) | ![Profile](public/img/preview_profile.png) |
 
 ## Fitur Utama
 
