@@ -114,37 +114,151 @@
 
 ## 📊 Application Flowchart
 
-Berikut adalah alur kerja utama aplikasi Pulih:
+### User Flow
 
-![Pulih Application Flowchart](docs/flowchart.png)
+```mermaid
+flowchart TB
+    subgraph Entry["🚀 Entry Point"]
+        A[("👤 User")] --> B["🏠 Landing Page"]
+    end
 
-**Penjelasan Alur:**
-1. **User** membuka aplikasi dan masuk ke **Landing Page**
-2. **Authentication** - Login/Register atau Mode Anonim
-3. **Chat Interface** - Antarmuka utama untuk berkomunikasi dengan AI
-4. **Select Feature** - Pilih fitur yang tersedia:
-   - 📊 **Mood Tracker** → Log mood → Simpan ke database
-   - 📓 **Journal** → Tulis catatan → Edit/Hapus → Simpan entry
-   - 🧘 **Breathing** → Latihan napas 4-7-8 terpandu
-   - 🌿 **Grounding** → Latihan grounding 5-4-3-2-1
-   - 📋 **Self-Test** → PHQ-9/GAD-7 Assessment
-   - 📈 **Progress** → Dashboard analytics & achievements
-   - 👤 **Profile** → Kelola akun
-5. **AI Context** - Data mood, jurnal, dan assessment digunakan untuk personalisasi respons
-6. **AI Counselor** - Memproses pesan dan menentukan jenis respons
-7. **Crisis Detection** - Deteksi kondisi krisis:
-   - **Normal** → Respons empatik biasa
-   - **Crisis** → Respons krisis + akses hotline 119
+    subgraph Auth["🔐 Authentication"]
+        B --> C{Login Method?}
+        C -->|Register| D["📝 Create Account"]
+        C -->|Login| E["🔑 Enter Credentials"]
+        C -->|Anonymous| F["👻 Skip Auth"]
+        D --> G["✅ Authenticated"]
+        E --> G
+        F --> G
+    end
 
-**Admin Panel Flow:**
-1. **Admin** akses `/admin/login.html`
-2. **Authentication** - Login dengan credentials dari environment variables
-3. **Dashboard** - Statistik pengguna, sesi, dan aktivitas
-4. **Features**:
-   - 👥 **User Management** → View/search/suspend users
-   - 💬 **Chat Monitoring** → View recent chat sessions
-   - 📊 **Analytics** → Mood stats & activity charts
-   - 📓 **Journal Monitoring** → Recent journal entries
+    subgraph MainApp["💬 Main Application"]
+        G --> H["💭 Chat Interface"]
+        
+        H --> I["📊 Mood Tracker"]
+        H --> J["📓 Journal"]
+        H --> K["🧘 Breathing"]
+        H --> L["🌿 Grounding"]
+        H --> M["📋 Self-Test"]
+        H --> N["📈 Progress"]
+        H --> O["👤 Profile"]
+    end
+
+    subgraph Features["⚙️ Feature Details"]
+        I --> I1["Log Mood 1-5"] --> I2["View 7-Day Graph"]
+        J --> J1["Write Entry"] --> J2["AI Feedback"]
+        K --> K1["4-7-8 Breathing"] --> K2["Guided Animation"]
+        L --> L1["5-4-3-2-1 Senses"] --> L2["Step-by-Step Guide"]
+        M --> M1["PHQ-9 / GAD-7"] --> M2["Score & Severity"]
+        N --> N1["Analytics Dashboard"] --> N2["Achievements"]
+    end
+
+    subgraph AIEngine["🤖 AI Processing"]
+        H -->|User Message| P["🧠 AI Context Engine"]
+        I2 -.->|Mood Data| P
+        J2 -.->|Journal Data| P
+        M2 -.->|Assessment Data| P
+        
+        P --> Q["🎯 AI Counselor LLM"]
+        Q --> R{Crisis Detection?}
+        R -->|No| S["💚 Empathic Response"]
+        R -->|Yes| T["🚨 Crisis Response"]
+        T --> U["📞 Hotline 119 Access"]
+        S --> H
+        T --> H
+    end
+
+    subgraph Database["💾 Data Storage"]
+        I1 --> DB[("🗄️ MySQL Database")]
+        J1 --> DB
+        M1 --> DB
+        O --> DB
+    end
+
+    style Entry fill:#1a1a2e,stroke:#16213e,color:#fff
+    style Auth fill:#16213e,stroke:#0f3460,color:#fff
+    style MainApp fill:#0f3460,stroke:#e94560,color:#fff
+    style AIEngine fill:#533483,stroke:#e94560,color:#fff
+    style Database fill:#1a1a2e,stroke:#16213e,color:#fff
+```
+
+### Admin Panel Flow
+
+```mermaid
+flowchart TB
+    subgraph AdminAuth["🔐 Admin Authentication"]
+        AA[("🔑 Admin")] --> AB["📄 /admin/login.html"]
+        AB --> AC{Valid Credentials?}
+        AC -->|No| AD["❌ Rate Limited"]
+        AD -->|Retry| AB
+        AC -->|Yes| AE["🎫 Generate Token"]
+        AE --> AF["✅ Authenticated"]
+    end
+
+    subgraph Dashboard["📊 Admin Dashboard"]
+        AF --> AG["🏠 Dashboard Home"]
+        
+        AG --> AH["📈 Statistics Overview"]
+        AH --> AH1["Total Users"]
+        AH --> AH2["Active Sessions"]
+        AH --> AH3["Mood Distribution"]
+        AH --> AH4["Chat Activity Graph"]
+    end
+
+    subgraph UserMgmt["👥 User Management"]
+        AG --> AI["👥 /admin/users.html"]
+        AI --> AI1["🔍 Search Users"]
+        AI --> AI2["📋 View User List"]
+        AI2 --> AI3["👁️ View Details"]
+        AI2 --> AI4["⏸️ Suspend User"]
+        AI2 --> AI5["🗑️ Delete User"]
+    end
+
+    subgraph Monitoring["📡 Monitoring"]
+        AG --> AJ["💬 Chat Monitoring"]
+        AJ --> AJ1["Recent Chats"]
+        AJ --> AJ2["View Chat Details"]
+        
+        AG --> AK["📓 Journal Monitoring"]
+        AK --> AK1["Recent Entries"]
+        AK --> AK2["Crisis Detection Review"]
+    end
+
+    subgraph DataFlow["🔄 Data Flow"]
+        AI3 --> DB2[("🗄️ MySQL")]
+        AJ2 --> DB2
+        AK1 --> DB2
+        AH1 --> DB2
+    end
+
+    style AdminAuth fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Dashboard fill:#16213e,stroke:#0f3460,color:#fff
+    style UserMgmt fill:#0f3460,stroke:#533483,color:#fff
+    style Monitoring fill:#533483,stroke:#e94560,color:#fff
+    style DataFlow fill:#1a1a2e,stroke:#16213e,color:#fff
+```
+
+### Penjelasan Alur User
+
+| Step | Proses | Deskripsi |
+|------|--------|-----------|
+| 1 | **Entry** | User membuka aplikasi via Landing Page |
+| 2 | **Auth** | Login/Register atau Mode Anonim |
+| 3 | **Chat** | Antarmuka utama untuk berkomunikasi dengan AI |
+| 4 | **Features** | Akses Mood Tracker, Journal, Breathing, Grounding, Self-Test, Progress |
+| 5 | **AI Context** | Data user (mood, jurnal, assessment) digunakan untuk personalisasi |
+| 6 | **AI Response** | LLM memproses pesan dengan crisis detection |
+| 7 | **Crisis Path** | Jika terdeteksi krisis → respons khusus + akses hotline 119 |
+
+### Penjelasan Alur Admin
+
+| Step | Proses | Deskripsi |
+|------|--------|-----------|
+| 1 | **Login** | Admin akses `/admin/login.html` dengan credentials dari env |
+| 2 | **Rate Limit** | Proteksi brute-force dengan exponential backoff |
+| 3 | **Dashboard** | Statistik: total users, sessions, mood distribution, activity |
+| 4 | **User Mgmt** | Search, view, suspend, delete users |
+| 5 | **Monitoring** | Pantau chat sessions dan journal entries untuk QA |
 
 ## 🛠️ Teknologi yang Digunakan
 
