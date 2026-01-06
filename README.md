@@ -4,6 +4,8 @@
 
 ![Tampilan Aplikasi](public/img/preview.png)
 
+![Chat Interface](public/img/chat_preview.png)
+
 ## ✨ Fitur Utama
 
 ### 💬 Chatbot AI Empatik
