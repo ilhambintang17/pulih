@@ -95,7 +95,7 @@
 - **Curated Content**: Koleksi afirmasi yang relevan untuk pemulihan.
 - **Sidebar Display**: Ditampilkan di sidebar untuk reminder positif.
 
-### � Admin Panel
+### 🔐 Admin Panel
 - **Secure Authentication**: Login admin dengan rate limiting dan exponential backoff.
 - **Dashboard Analytics**: Statistik pengguna, sesi chat, dan aktivitas counseling.
 - **User Management**: Lihat, cari, dan kelola akun pengguna.
@@ -108,7 +108,7 @@
 |------|-------------|
 | **super_admin** | Full access: user management, chat monitoring, analytics, system settings |
 
-### �📱 Mobile-First Responsive Design
+### 📱 Mobile-First Responsive Design
 - **Optimized Mobile UI**: Sidebar compact dengan tombol hamburger.
 - **Touch-Friendly**: Tombol dan area scroll yang mudah disentuh.
 - **Light Mode Default**: Default theme light dengan opsi dark mode.
