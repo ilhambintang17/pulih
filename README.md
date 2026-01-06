@@ -169,8 +169,8 @@ Berikut adalah alur kerja utama aplikasi Pulih:
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/MuhamadMatin/prototypePulih.git
-   cd prototypePulih
+   git clone https://github.com/ilhambintang17/pulih.git
+   cd pulih
    ```
 
 2. **Install Dependensi**
