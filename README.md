@@ -93,7 +93,20 @@
 - **Curated Content**: Koleksi afirmasi yang relevan untuk pemulihan.
 - **Sidebar Display**: Ditampilkan di sidebar untuk reminder positif.
 
-### 📱 Mobile-First Responsive Design
+### � Admin Panel
+- **Secure Authentication**: Login admin dengan rate limiting dan exponential backoff.
+- **Dashboard Analytics**: Statistik pengguna, sesi chat, dan aktivitas counseling.
+- **User Management**: Lihat, cari, dan kelola akun pengguna.
+- **Chat Monitoring**: Pantau sesi chat terbaru untuk quality assurance.
+- **Mood Statistics**: Agregasi data mood seluruh pengguna.
+- **Journal Monitoring**: Akses jurnal terbaru untuk deteksi krisis.
+
+#### Admin Roles
+| Role | Permissions |
+|------|-------------|
+| **super_admin** | Full access: user management, chat monitoring, analytics, system settings |
+
+### �📱 Mobile-First Responsive Design
 - **Optimized Mobile UI**: Sidebar compact dengan tombol hamburger.
 - **Touch-Friendly**: Tombol dan area scroll yang mudah disentuh.
 - **Light Mode Default**: Default theme light dengan opsi dark mode.
@@ -122,6 +135,16 @@ Berikut adalah alur kerja utama aplikasi Pulih:
 7. **Crisis Detection** - Deteksi kondisi krisis:
    - **Normal** → Respons empatik biasa
    - **Crisis** → Respons krisis + akses hotline 119
+
+**Admin Panel Flow:**
+1. **Admin** akses `/admin/login.html`
+2. **Authentication** - Login dengan credentials dari environment variables
+3. **Dashboard** - Statistik pengguna, sesi, dan aktivitas
+4. **Features**:
+   - 👥 **User Management** → View/search/suspend users
+   - 💬 **Chat Monitoring** → View recent chat sessions
+   - 📊 **Analytics** → Mood stats & activity charts
+   - 📓 **Journal Monitoring** → Recent journal entries
 
 ## 🛠️ Teknologi yang Digunakan
 
@@ -156,7 +179,7 @@ Berikut adalah alur kerja utama aplikasi Pulih:
    ```
 
 3. **Konfigurasi Environment Variable**
-   Buat file `.env` di direktori utama:
+   Buat file `.env` di direktori utama (lihat `.env.example`):
    ```env
    PORT=3000
    
@@ -164,12 +187,17 @@ Berikut adalah alur kerja utama aplikasi Pulih:
    DB_HOST=localhost
    DB_USER=root
    DB_PASSWORD=password_db_kamu
-   DB_NAME=pulih_db
+   DB_NAME=pisikologchatbot
+   # JAWSDB_URL=mysql://user:pass@host:port/dbname  # For Heroku
 
    # AI Configuration
-   INFERENCE_URL=https://api-inference.heroku.com
-   INFERENCE_KEY=kunci_api_anda
-   INFERENCE_MODEL_ID=model-id-anda
+   INFERENCE_URL=https://us.inference.heroku.com
+   INFERENCE_KEY=your_inference_key
+   INFERENCE_MODEL_ID=your_model_id
+
+   # Admin Panel
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=your_secure_password
    ```
 
 4. **Jalankan Server**
@@ -201,17 +229,27 @@ Berikut adalah alur kerja utama aplikasi Pulih:
 ## 📁 Struktur Project
 
 ```
-pisikologchatbot/
+pulih/
 ├── public/
 │   ├── index.html          # Landing & Login Page
 │   ├── chat.html           # Main Chat Interface
 │   ├── profile.html        # User Profile Page
-│   ├── css/                # Stylesheets
+│   ├── admin/              # Admin Panel
+│   │   ├── index.html      # Admin Dashboard
+│   │   ├── login.html      # Admin Login
+│   │   ├── users.html      # User Management
+│   │   ├── css/            # Admin Styles
+│   │   └── js/             # Admin Scripts
+│   ├── css/                # Main Stylesheets
 │   ├── js/
 │   │   ├── auth.js         # Authentication Logic
-│   │   ├── chat.js         # Chat & AI Streaming
+│   │   ├── chat.js         # Chat UI & Events
+│   │   ├── chat-logic.js   # Chat Business Logic
 │   │   ├── config.js       # Tailwind Config & Theme
 │   │   ├── dashboard.js    # Dashboard Controller
+│   │   ├── profile.js      # Profile Page Logic
+│   │   ├── components/     # Reusable Components
+│   │   ├── services/       # API Services
 │   │   └── modules/
 │   │       ├── achievements.js  # Achievement System
 │   │       ├── affirmations.js  # Daily Affirmations
@@ -224,10 +262,12 @@ pisikologchatbot/
 │   │       ├── safetyplan.js    # Safety Plan Builder
 │   │       ├── ui.js            # UI Utilities
 │   │       └── VoiceRecorder.js # Voice-to-Text
-│   └── img/                # Images & Assets
+│   ├── img/                # Images & Assets
+│   └── legacy/             # Legacy Files
 ├── server/
 │   ├── routes/
 │   │   ├── achievements.js # Achievements API
+│   │   ├── admin.js        # Admin Panel API
 │   │   ├── assessment.js   # Assessment API
 │   │   ├── auth.js         # Auth Endpoints
 │   │   ├── chat.js         # Chat & AI Endpoint
@@ -235,15 +275,21 @@ pisikologchatbot/
 │   │   ├── journal.js      # Journal CRUD API
 │   │   ├── mood.js         # Mood Tracker API
 │   │   ├── profile.js      # Profile API
-│   │   └── safetyplan.js   # Safety Plan API
+│   │   ├── safetyplan.js   # Safety Plan API
+│   │   └── utils.js        # Utility Endpoints
 │   ├── utils/
+│   │   ├── adminDb.js      # Admin Database Queries
 │   │   ├── db.js           # Database Connection
-│   │   └── systemPrompt.js # AI System Prompts
+│   │   ├── systemPrompt.js # AI System Prompts
+│   │   ├── manual_migrate.js # DB Migration Script
+│   │   └── resetDb.js      # DB Reset Utility
 │   └── config/
 │       └── schema.sql      # Database Schema
 ├── data/
 │   ├── achievements-config.json  # Achievement Definitions
-│   └── affirmations.json         # Affirmation Collection
+│   ├── affirmations.json         # Affirmation Collection
+│   ├── chats.json                # Chat Data (dev)
+│   └── users.json                # User Data (dev)
 ├── docs/
 │   └── flowchart.png       # Application Flowchart
 ├── server.js               # Main Server Entry
